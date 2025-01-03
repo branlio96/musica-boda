@@ -1,53 +1,52 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Autenticación de Spotify</title>
+  <title>Spotify Playback</title>
+</head>
+<body>
+  <h1>Reproductor Spotify</h1>
+  <button id="playSong">Reproducir y repetir canción</button>
+
   <script>
-    // Tu client ID de Spotify
-    const clientId = 'db3c7b32f6394c609770e9ba8666f657'; // Reemplazado con tu client ID
+    const clientId = 'db3c7b32f6394c609770e9ba8666f657';
+    const redirectUri = 'https://branlio96.github.io/musica-boda/callback';
+    const trackUri = 'spotify:track:6SKwQghsR8AISlxhcwyA9R';
 
-    // URI de redirección configurado en Spotify Developer
-    const redirectUri = 'https://branlio96.github.io/musica-boda/callback'; // Usando callback como URI de redirección
-
-    // Los permisos necesarios para la aplicación
-    const scopes = 'user-modify-playback-state user-read-playback-state';
-
-    // URL de autenticación de Spotify
-    const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
-
-    // Función para redirigir a la página de autenticación de Spotify
-    function loginToSpotify() {
+    if (!window.location.hash.includes('access_token')) {
+      const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user-modify-playback-state%20user-read-playback-state`;
       window.location.href = authUrl;
     }
 
-    // Función para obtener el token de la URL después de la redirección
-    function getTokenFromUrl() {
-      const urlParams = new URLSearchParams(window.location.hash.substring(1));
-      return urlParams.get('access_token');
-    }
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get('access_token');
 
-    // Si ya hay un token en la URL, lo mostramos
-    window.onload = function() {
-      const token = getTokenFromUrl();
-      if (token) {
-        document.getElementById('message').innerText = '¡Autenticación exitosa!';
-        document.getElementById('token').innerText = `Token de acceso: ${token}`;
-      } else {
-        document.getElementById('message').innerText = 'No autenticado';
+    document.getElementById('playSong').addEventListener('click', async () => {
+      try {
+        await fetch('https://api.spotify.com/v1/me/player/play', {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ uris: [trackUri] }),
+        });
+
+        await fetch('https://api.spotify.com/v1/me/player/repeat?state=track', {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        alert('Reproducción iniciada en bucle');
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al iniciar la reproducción. Verifica la consola.');
       }
-    };
+    });
   </script>
-</head>
-<body>
-  <h1>Spotify Authentication</h1>
-  <p id="message">No autenticado</p>
-
-  <!-- Muestra el token de acceso si está presente -->
-  <p id="token"></p>
-
-  <!-- Botón para iniciar sesión en Spotify -->
-  <button onclick="loginToSpotify()">Iniciar sesión en Spotify</button>
 </body>
 </html>
