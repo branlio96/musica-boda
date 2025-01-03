@@ -1,52 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spotify Playback</title>
+  <title>Prueba GitHub Pages</title>
 </head>
 <body>
-  <h1>Reproductor Spotify</h1>
-  <button id="playSong">Reproducir y repetir canción</button>
-
-  <script>
-    const clientId = 'db3c7b32f6394c609770e9ba8666f657';
-    const redirectUri = 'https://branlio96.github.io/musica-boda/';
-    const trackUri = 'spotify:track:6SKwQghsR8AISlxhcwyA9R';
-
-    if (!window.location.hash.includes('access_token')) {
-      const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user-modify-playback-state%20user-read-playback-state`;
-      window.location.href = authUrl;
-    }
-
-    const hash = window.location.hash.substring(1);
-    const params = new URLSearchParams(hash);
-    const accessToken = params.get('access_token');
-
-    document.getElementById('playSong').addEventListener('click', async () => {
-      try {
-        await fetch('https://api.spotify.com/v1/me/player/play', {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ uris: [trackUri] }),
-        });
-
-        await fetch('https://api.spotify.com/v1/me/player/repeat?state=track', {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        alert('Reproducción iniciada en bucle');
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error al iniciar la reproducción. Verifica la consola.');
-      }
-    });
-  </script>
+  <h1>¡GitHub Pages está funcionando!</h1>
+  <p>Este es un archivo de prueba para verificar que GitHub Pages esté configurado correctamente.</p>
 </body>
 </html>
